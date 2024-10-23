@@ -14,8 +14,11 @@ WORKDIR /app
 
 # Install Python dependencies
 COPY requirements.txt /app/
+ARG DEV=false
 RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+    && pip install -r requirements.txt \
+    if [DEV = "true"]; \
+        then pip install -r requirements.dev.txt ; \
 
 # Copy the project files
 COPY . /app/
