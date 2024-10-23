@@ -18,4 +18,4 @@ jobs:
       - name: Test
         run: docker compose run --rm --entrypoint "python3 manage.py test" app
       - name: Link
-        run: docker-compose run --rm app sh -c "flake8"
+        run: docker compose run --rm app sh -c "flake8"
