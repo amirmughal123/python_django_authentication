@@ -1,27 +1,24 @@
-FROM python:3.9-alpine3.13
-LABEL maintainer="Amirmughal123"
+# Use the official Python image from the Docker Hub
+FROM python:3.9-alpine
 
-ENV PYTHONUNBUFFERED 1
+# Set environment variables to prevent Python from writing .pyc files to disk and to buffer stdout and stderr
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-COPY ./requirements.txt /tmp/requirements.txt
-COPY ./requirements.dev.txt /tmp/requirements.dev.txt
-COPY ./app /app
+# Install dependencies and PostgreSQL dev libraries needed for psycopg2
+RUN apk update \
+    && apk add --no-cache gcc musl-dev postgresql-dev python3-dev libffi-dev openssl-dev cargo
+
+# Set work directory
 WORKDIR /app
-EXPOSE 8000
 
-ARG DEV=false
-RUN python -m venv /py && \
-    /py/bin/pip install --upgrade pip && \
-    /py/bin/pip install -r /tmp/requirements.txt && \
-    if [ $DEV = "true" ]; \
-        then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
-    fi && \
-    rm -rf /tmp && \
-    adduser \
-      --disabled-password \
-      --no-create-home \
-      django-user
+# Install Python dependencies
+COPY requirements.txt /app/
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
 
-ENV PATH="/py/bin:$PATH"
+# Copy the project files
+COPY . /app/
 
-USER django-user
+# Run the Django development server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
