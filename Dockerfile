@@ -17,8 +17,9 @@ COPY requirements.txt /app/
 ARG DEV=false
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt \
-    if [DEV = "true"]; \
+    && if [ "$DEV" = "true" ]; \
         then pip install -r requirements.dev.txt ; \
+    fi
 
 # Copy the project files
 COPY . /app/
